@@ -12,7 +12,7 @@ console.log('connecting to', config.MONGODB_URL)
 // connection to mongoDB
 // mongoose.set('strictQuery', false)
 mongoose.connect(config.MONGODB_URL, { useNewUrlParser: true })
- .then(() => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch((error) => {
