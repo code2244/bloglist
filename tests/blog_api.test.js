@@ -44,6 +44,7 @@ describe('list all blogs endpoint', () => {
 
 describe('add new blog endpoint', () => {
   test('can add new blog', async () => {
+    const blogsAtStart = await helper.blogsInDb()
     // add new blog
     const newBlog = {
       title: 'A new blog',
@@ -64,8 +65,8 @@ describe('add new blog endpoint', () => {
     expect(post_response.body).toEqual(newBlog)
 
     // verify that the total number of blogs has increased by 1
-    const get_response = await api.get('/api/blogs')
-    expect(get_response.body.length).toEqual(helper.blogFixtures.length + 1)
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd.body.length).toBe(blogsAtStart.length + 1)
   })
 
   test('can add a new blog without likes and they default to 0', async () => {
@@ -79,7 +80,44 @@ describe('add new blog endpoint', () => {
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.likes).toEqual(0)
+    expect(response.body.likes).toBe(0)
+  })
+
+  test('cannot add a new blog without a title', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    // attempting to add a blog without a title returns a 400 response
+    const newBlog = {
+      author: 'Joe',
+      url: 'http://www.google.com'
+    }
+    const post_response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+    // make sure the user got the error message
+    expect(post_response.body.error).toBeDefined
+
+    // the number of blogs in the system is unchanged
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(blogsAtStart.length)
+  })
+
+  test('cannot add a new blog without a url', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    // attempting to add a blog without a title returns a 400 response
+    const newBlog = {
+      title: 'This should fail',
+      author: 'Joe'
+    }
+    const post_response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+    // Make sure the user got an error message
+    expect(post_response.body.error).toBeDefined()
+    // the number of blogs in the system in unchanged
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(blogsAtStart.length)
   })
 })
 
