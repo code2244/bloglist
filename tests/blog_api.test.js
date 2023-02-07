@@ -19,16 +19,23 @@ beforeAll(async () => {
 
 describe('list all blogs endpoint', () => {
   // implies the amount of blogs are correct
-  test('the blogs contain the correct data', async () => {
+  test('the blogs contain the fixture data', async () => {
     const response = await api.get('/api/blogs')
 
     const body = response.body.map(blog => {
-      delete blog._id
-      delete blog._v
+      delete blog.id
       return blog
     })
 
     expect(body).toEqual(helper.blogFixtures)
+  })
+
+  test('the blogs contain an "id" property', async () => {
+    const response = await api.get('/api/blogs')
+
+    response.body.forEach(blog => {
+      expect(blog.id).toBeDefined()
+    })
   })
 })
 
