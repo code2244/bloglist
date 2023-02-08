@@ -67,6 +67,20 @@ describe('add new blog endpoint', () => {
     const get_response = await api.get('/api/blogs')
     expect(get_response.body.length).toEqual(helper.blogFixtures.length + 1)
   })
+
+  test('can add a new blog without likes and they default to 0', async () => {
+    const newBlog = {
+      title: 'Another new blog',
+      author: 'Jared',
+      url: 'http://www.example.com'
+    }
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.likes).toEqual(0)
+  })
 })
 
 afterAll(() => {
