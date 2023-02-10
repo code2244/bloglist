@@ -19,6 +19,8 @@ mongoose.connect(config.MONGODB_URL, { useNewUrlParser: true })
     console.log('error connecting to MongoDB', error.message)
   })
 
+mongoose.set('useFindAndModify', false)
+
 app.use(cors())
 app.use(bodyParser.json())
 app.use(middleware.requestLogger)
